@@ -1,0 +1,17 @@
+{
+  "name": "surecut",
+  "version": "0.0.0",
+  "description": "handle shortcuts",
+  "main": "app.js",
+  "scripts": {
+    "test": "test"
+  },
+  "keywords": [
+    "js",
+    "javascript",
+    "shortcut",
+    "keyboard"
+  ],
+  "author": "saintMim",
+  "license": "ISC"
+}
