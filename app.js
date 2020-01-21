@@ -17,44 +17,75 @@ class Surecut {
             w_time: 150,
             a_key   : 191, // 191 = Slash-key
             when: 'keyup',
-            a_warn: true,
+            a_warn: false,
         }
 
         this.active = false;
     }
 
     initial () {
-        document.addEventListener(options.when, function(event) {
-            // activating the shortcut mode
-            // hitting Slash-key twice will activate the shortcut mode
+        this.active = true;
 
-            // console.log('x1', event.code);
-            // console.log('x2', event);
-            // console.log(event.keyCode , options.a_key)
+        return this;
+    }
 
-            if (event.keyCode == options.a_key) {
+    /**
+     * this actually runs the code suppose to be run 
+     * when the "shortcut" combination satisfied
+     * 
+     * @param {callable} callback 
+     */
+    doit(callback) {
 
-                let diff = Math.round(event.timeStamp - options.h_last);
+        // dont do anything if it has not activated
+        if (this.active === false) {
+            return this;
+        }
+        
+        let myself = this;
 
-                if (diff < options.a_time) {
-                    // activating...
-                    this.active = true;
+        document.addEventListener(this.options.when, function(event) {
 
-                    console.log('-x- activating the sortcut mode...', diff);
+            if (event.keyCode == myself.options.a_key) {
 
-                } else if ((options.a_warn === true) && (diff < options.a_time + options.w_time)) {
+                let diff = Math.round(event.timeStamp - myself.options.h_last);
+
+                if (diff < myself.options.a_time) {
+                    // actually run the callback
+                    callback();
+
+                } else if ((myself.options.a_warn === true) && (diff < myself.options.a_time + myself.options.w_time)) {
                     // warn the user to hit the key faster
                     console.log('Almost there! hit faster');
+
+                    // TODO: engage some notification to show the end-user
                 }
 
                 // store the last time the key got hit!
-                options.h_last = event.timeStamp;
+                myself.options.h_last = event.timeStamp;
             }
         });
     }
 
+    /**
+     * add a cssClassName to the elements that have className class
+     * 
+     * @param {string} className the class names need to be added
+     * @param {string} target the target element
+     */
+    addClass(className, target) {
+        this.doit(function() {
+            let el = document.getElementsByClassName(target);
+
+            for (let i=0; i<el.length; i++) {
+                console.log('x', i, el[i]);
+                el[i].classList.add(className);
+            }
+        });
+
+        return this;
+    }
 }
 
-// exporting looks different from Node.js but is almost as simple
-// export default class { Surecut };
+
 module.exports = Surecut;
