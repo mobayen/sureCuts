@@ -1,3 +1,23 @@
+function whatType(el) {
+
+    if (typeof el !== 'string') {
+        // TODO throw an exeption
+        console.log('it is not a string');
+
+        return undefined;
+    }
+
+    // TODO:  what is the best definition for html class and id attributes ?
+    if (el.indexOf('.') >= 0) {
+        return 'classAtrib';
+    } else if (el.indexOf('#') >= 0) {
+        return 'idAtrib';
+    }
+
+    // by default it consider it as tagName
+    return 'tagName';
+}
+
 class Surecut {
 
     // prefiexes_
@@ -18,7 +38,7 @@ class Surecut {
 
         this.active = false;
 
-        this.targetEl = null;
+        this.targetedElements = [];
     }
 
     initial () {
@@ -70,8 +90,20 @@ class Surecut {
      * 
      * @param {string} targetEl html dom
      */
-    target(targetEl) {
-        this.targetEl = targetEl;
+    target(target) {
+        target = target.trim();
+
+        let typex = whatType(target);
+        
+        // TODO make it more efficient
+        // remove the "." and "#"
+        target = target.slice(1);
+
+        if (typex === 'idAtrib') {
+            this.targetedElements.push(document.getElementById(target));
+        } else if (typex === 'classAtrib') {
+            this.targetedElements.push(...document.getElementsByClassName(target));
+        }
 
         return this;
     }
@@ -87,9 +119,9 @@ class Surecut {
 
         this.doit(function() {
 
-            let elements = document.getElementsByClassName(myself.targetEl);
-
-            for (const i of elements) {
+            // TODO move it to a separated private function
+            // TODO.. apply() for example
+            for (const i of myself.targetedElements) {
                 i.classList.add(className);
             }
         });

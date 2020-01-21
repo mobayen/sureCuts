@@ -10,3 +10,6 @@ new functionality
 ## 0.1.0
 new functionality: separate method to target (a) element(s)
 - target('aClassName').addClass('newClassName')
+
+## 0.2.0
+handle both class and id selectors
