@@ -1,7 +1,3 @@
-// TODO: (a_warn OR activation_warn) set a warning zone - when someone trying to activate he/she is not ast enought but close
-// some warning can help to warn him/her to hit the Key faster !!!
-// 
-
 class Surecut {
 
     // prefiexes_
@@ -21,6 +17,8 @@ class Surecut {
         }
 
         this.active = false;
+
+        this.targetEl = null;
     }
 
     initial () {
@@ -68,14 +66,28 @@ class Surecut {
     }
 
     /**
+     * which dom element is targeted?
+     * 
+     * @param {string} targetEl html dom
+     */
+    target(targetEl) {
+        this.targetEl = targetEl;
+
+        return this;
+    }
+
+    /**
      * add a cssClassName to the elements that have className class
      * 
      * @param {string} className the class names need to be added
-     * @param {string} target the target element
      */
-    addClass(className, target) {
+    addClass(className) {
+
+        let myself = this;
+
         this.doit(function() {
-            let elements = document.getElementsByClassName(target);
+
+            let elements = document.getElementsByClassName(myself.targetEl);
 
             for (const i of elements) {
                 i.classList.add(className);
