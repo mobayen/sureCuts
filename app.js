@@ -2,54 +2,59 @@
 // some warning can help to warn him/her to hit the Key faster !!!
 // 
 
-// w_ warning
-// a_ active/acvate/activation
-// h_ hit
+class Surecut {
 
-let options = {
-    h_last  : 0,
-    a_time  : 300,
-    w_time: 150,
-    a_key   : 191, // 191 = Slash-key
-    when: 'keyup',
-    a_warn: true,
+    // prefiexes_
+    // w_ warning
+    // a_ active/acvate/activation
+    // h_ hit
 
-}
-
-function activate() {
-    // do whatever needed to activate shortcut mode
-}
-
-exports.initial = function() {
-    console.log('my new package to handdle shortcuts');
-
-    document.addEventListener(options.when, function(e) {
-        // activating the shortcut mode
-        // hitting Slash-key twice will activate the shortcut mode
-
-        // console.log('x1', e.code);
-        console.log('x2', e);
-        // console.log(e.keyCode , options.a_key)
-
-        if (e.keyCode == options.a_key) {
-
-            let diff = Math.round(e.timeStamp - options.h_last);
-
-            if (diff < options.a_time) {
-                // activating...
-                activate();
-                console.log('-x- activating the sortcut mode...', diff);
-            } else if ((options.a_warn === true) && (diff < options.a_time + options.w_time)) {
-                // warn the user to hit the key faster
-                console.log('Almost there! hit faster');
-            }
-
-            // store the last time the key got hit!
-            options.h_last = e.timeStamp;
+    // TODO: make options to be setable!
+    constructor() {
+        this.options = {
+            h_last  : 0,
+            a_time  : 300,
+            w_time: 150,
+            a_key   : 191, // 191 = Slash-key
+            when: 'keyup',
+            a_warn: true,
         }
-    });
-    
-    // document.addEventListener('keydown', function(e) {
-    //     console.log('x2', e);
-    // });
+
+        this.active = false;
+    }
+
+    initial () {
+        document.addEventListener(options.when, function(event) {
+            // activating the shortcut mode
+            // hitting Slash-key twice will activate the shortcut mode
+
+            // console.log('x1', event.code);
+            // console.log('x2', event);
+            // console.log(event.keyCode , options.a_key)
+
+            if (event.keyCode == options.a_key) {
+
+                let diff = Math.round(event.timeStamp - options.h_last);
+
+                if (diff < options.a_time) {
+                    // activating...
+                    this.active = true;
+
+                    console.log('-x- activating the sortcut mode...', diff);
+
+                } else if ((options.a_warn === true) && (diff < options.a_time + options.w_time)) {
+                    // warn the user to hit the key faster
+                    console.log('Almost there! hit faster');
+                }
+
+                // store the last time the key got hit!
+                options.h_last = event.timeStamp;
+            }
+        });
+    }
+
 }
+
+// exporting looks different from Node.js but is almost as simple
+// export default class { Surecut };
+module.exports = Surecut;
