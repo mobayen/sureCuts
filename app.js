@@ -75,11 +75,10 @@ class Surecut {
      */
     addClass(className, target) {
         this.doit(function() {
-            let el = document.getElementsByClassName(target);
+            let elements = document.getElementsByClassName(target);
 
-            for (let i=0; i<el.length; i++) {
-                console.log('x', i, el[i]);
-                el[i].classList.add(className);
+            for (const i of elements) {
+                i.classList.add(className);
             }
         });
 
