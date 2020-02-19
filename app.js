@@ -150,7 +150,26 @@ class Surecut {
 
         return this;
     }
-}
 
+    /**
+     * keyboard shortcut to simulate click
+     */
+    click() {
+        let myself = this;
+
+        this.doit(function() {
+            console.log('x clicked', myself.targetedElements);
+
+            // myself.targetedElements[0].click();
+            
+            for (const i of myself.targetedElements) {
+                i.click();
+            }
+        });
+
+        return this;
+    }
+
+}
 
 module.exports = Surecut;
