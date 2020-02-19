@@ -128,6 +128,28 @@ class Surecut {
 
         return this;
     }
+
+    /**
+     * focus on the targeted (the first) element(s)
+     * 
+     */
+    focus() {
+        
+        let myself = this;
+
+        this.doit(function() {
+            if (myself.targetedElements.length == 0) {
+                console.log('No target element found!');
+            } else if (myself.targetedElements.length >= 2) {
+                console.log('more than one element found to focus on!');
+            }
+
+            // focus on the first element, if any!
+            myself.targetedElements[0].focus();
+        });
+
+        return this;
+    }
 }
 
 
