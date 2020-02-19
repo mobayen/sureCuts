@@ -119,11 +119,9 @@ class Surecut {
 
         this.doit(function() {
 
-            // TODO move it to a separated private function
-            // TODO.. apply() for example
-            for (const i of myself.targetedElements) {
-                i.classList.add(className);
-            }
+            myself.targetedElements.map(function(el) {
+                el.classList.add(className);
+            });
         });
 
         return this;
@@ -158,13 +156,9 @@ class Surecut {
         let myself = this;
 
         this.doit(function() {
-            console.log('x clicked', myself.targetedElements);
-
-            // myself.targetedElements[0].click();
-            
-            for (const i of myself.targetedElements) {
-                i.click();
-            }
+            myself.targetedElements.map(function(el) {
+                el.click();
+            });
         });
 
         return this;
