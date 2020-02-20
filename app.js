@@ -23,12 +23,10 @@ class Surecut {
     // prefiexes_
     // w_ warning
     // a_ active/acvate/activation
-    // h_ hit
 
     // TODO: make options to be setable!
     constructor() {
         this.options = {
-            h_last  : 0,
             a_time  : 300,
             w_time: 150,
             a_key   : 191, // 191 = Slash-key
@@ -36,12 +34,19 @@ class Surecut {
             a_warn: false,
         }
 
+        // keeps the last time the key got hit!
+        this.last_hit = 0;
+
         this.active = false;
 
         this.targetedElements = [];
     }
 
-    initial () {
+    initial (options) {
+        if (typeof options === 'object') {
+            this.options = { ...this.options, ...options};
+        }
+
         this.active = true;
 
         return this;
@@ -64,24 +69,31 @@ class Surecut {
 
         document.addEventListener(this.options.when, function(event) {
 
-            if (event.keyCode == myself.options.a_key) {
+            console.log('x event', event);
 
-                let diff = Math.round(event.timeStamp - myself.options.h_last);
-
-                if (diff < myself.options.a_time) {
-                    // actually run the callback
-                    callback();
-
-                } else if ((myself.options.a_warn === true) && (diff < myself.options.a_time + myself.options.w_time)) {
-                    // warn the user to hit the key faster
-                    console.log('Almost there! hit faster');
-
-                    // TODO: engage some notification to show the end-user
-                }
-
-                // store the last time the key got hit!
-                myself.options.h_last = event.timeStamp;
+            if (
+                (event.keyCode !== myself.options.a_key)
+                && (event.key !== myself.options.a_key)
+            ) {
+                return ;
             }
+
+            let diff = Math.round(event.timeStamp - this.last_hit);
+
+            if (diff < myself.options.a_time) {
+                // actually run the callback
+                callback();
+
+            } else if ((myself.options.a_warn === true) && (diff < myself.options.a_time + myself.options.w_time)) {
+                // warn the user to hit the key faster
+                console.log('Almost there! hit faster');
+
+                // TODO: engage some notification to show the end-user
+            }
+
+            // store the last time the key got hit!
+            this.last_hit = event.timeStamp;
+        
         });
     }
 
