@@ -30,12 +30,15 @@ class Surecut {
             a_time  : 300,
             w_time: 150,
             a_key   : 191, // 191 = Slash-key
+            a_kies: null,
+            a_kies_length: null,
             when: 'keyup',
             a_warn: false,
         }
 
         // keeps the last time the key got hit!
         this.last_hit = 0;
+        this.hitStack = [];
 
         this.active = false;
 
@@ -43,8 +46,14 @@ class Surecut {
     }
 
     initial (options) {
+
         if (typeof options === 'object') {
             this.options = { ...this.options, ...options};
+        }
+
+        // if the list of activation kies is initialized
+        if (Array.isArray(this.options.a_kies) && this.options.a_kies.length > 0) {
+            this.a_kies_length = this.options.a_kies.length;
         }
 
         this.active = true;
@@ -69,8 +78,6 @@ class Surecut {
 
         document.addEventListener(this.options.when, function(event) {
 
-            console.log('x event', event);
-
             if (
                 (event.keyCode !== myself.options.a_key)
                 && (event.key !== myself.options.a_key)
@@ -94,6 +101,34 @@ class Surecut {
             // store the last time the key got hit!
             this.last_hit = event.timeStamp;
         
+        });
+    }
+
+    doitx(callback) {
+        
+        // dont do anything if it has not activated
+        if (this.active === false) {
+            return this;
+        }
+
+        let itself = this;
+
+        document.addEventListener(this.options.when, function(event) {
+
+            hitStack_length = itself.hitStack.length;
+            
+            // current match:
+            let current_match = itself.options.a_kies[hitStack_length]
+
+            if (event.key === current_match || event.keyCode === current_match) {
+                itself.hitStack.push({ key: event.key, time: event.timeStamp });
+            }
+
+            // if the two length are equal, the shortcut kies have got hit in the right sequence
+            if (itself.options.a_kies.length === itself.hitStack.length) {
+                itself.hitStack = [];
+                callback();
+            }
         });
     }
 
@@ -167,7 +202,7 @@ class Surecut {
     click() {
         let myself = this;
 
-        this.doit(function() {
+        this.doitx(function() {
             myself.targetedElements.map(function(el) {
                 el.click();
             });
