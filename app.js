@@ -18,31 +18,51 @@ function whatType(el) {
     return 'tagName';
 }
 
-class Surecut {
+function checkTimeDiff(hitStack, maxT, warnT, warningCallback) {
 
-    // prefiexes_
-    // w_ warning
-    // a_ active/acvate/activation
+    for (let i = 1; i < hitStack.length; i++) {
+        const el = hitStack[i];
+        const prev_el = hitStack[i - 1];
+
+        const timeDiff = el.time - prev_el.time;
+        if (timeDiff > maxT) {
+
+            if (timeDiff < maxT + warnT) {
+                // warn the user to hit the key faster
+                if (typeof warningCallback === 'function') {
+                    warningCallback();
+                }
+            }
+            return false
+        }
+    }
+
+    return true;
+}
+
+class Surecut {
 
     // TODO: make options to be setable!
     constructor() {
         this.options = {
-            a_time  : 300,
-            w_time: 150,
-            a_key   : 191, // 191 = Slash-key
-            a_kies: null,
-            a_kies_length: null,
+            timeGap  : 300,
+            warningTime: 150,
+            activationKeys: [191, 191], // 191 = Slash-key
+            activationKeysLength: null,
             when: 'keyup',
             a_warn: false,
         }
 
-        // keeps the last time the key got hit!
-        this.last_hit = 0;
+        // keys history
         this.hitStack = [];
+        
+        // nextKey
+        this.nextKey = this.options.activationKeys[0]
 
         this.active = false;
 
         this.targetedElements = [];
+
     }
 
     initial (options) {
@@ -51,14 +71,27 @@ class Surecut {
             this.options = { ...this.options, ...options};
         }
 
-        // if the list of activation kies is initialized
-        if (Array.isArray(this.options.a_kies) && this.options.a_kies.length > 0) {
-            this.a_kies_length = this.options.a_kies.length;
+        // if the list of activation keys is initialized
+        if (Array.isArray(this.options.activationKeys) && this.options.activationKeys.length > 0) {
+            this.activationKeysLength = this.options.activationKeys.length;
         }
 
         this.active = true;
 
         return this;
+    }
+
+    /**
+     * Empty the key strock stack
+     * and reset the next key expected to the first key expected 
+     * 
+     * that means it start over 
+     * 
+     */
+    reset() {
+        // But first reset the hit-stack array as well as next-match expected
+        this.hitStack = [];
+        this.nextKey = this.options.activationKeys[0]
     }
 
     /**
@@ -68,43 +101,6 @@ class Surecut {
      * @param {callable} callback 
      */
     doit(callback) {
-
-        // dont do anything if it has not activated
-        if (this.active === false) {
-            return this;
-        }
-        
-        let myself = this;
-
-        document.addEventListener(this.options.when, function(event) {
-
-            if (
-                (event.keyCode !== myself.options.a_key)
-                && (event.key !== myself.options.a_key)
-            ) {
-                return ;
-            }
-
-            let diff = Math.round(event.timeStamp - this.last_hit);
-
-            if (diff < myself.options.a_time) {
-                // actually run the callback
-                callback();
-
-            } else if ((myself.options.a_warn === true) && (diff < myself.options.a_time + myself.options.w_time)) {
-                // warn the user to hit the key faster
-                console.log('Almost there! hit faster');
-
-                // TODO: engage some notification to show the end-user
-            }
-
-            // store the last time the key got hit!
-            this.last_hit = event.timeStamp;
-        
-        });
-    }
-
-    doitx(callback) {
         
         // dont do anything if it has not activated
         if (this.active === false) {
@@ -117,16 +113,39 @@ class Surecut {
 
             hitStack_length = itself.hitStack.length;
             
-            // current match:
-            let current_match = itself.options.a_kies[hitStack_length]
+            // next match expected
+            let nextKey = itself.options.activationKeys[hitStack_length]
 
-            if (event.key === current_match || event.keyCode === current_match) {
+            // if the last key pressed was not the next key expected
+            if (event.key !== nextKey && event.keyCode !== nextKey) {
+                // But first reset the hit-stack array as well as next-match expected
+                itself.reset();
+            }
+
+            if (event.key === nextKey || event.keyCode === nextKey) {
                 itself.hitStack.push({ key: event.key, time: event.timeStamp });
             }
 
-            // if the two length are equal, the shortcut kies have got hit in the right sequence
-            if (itself.options.a_kies.length === itself.hitStack.length) {
-                itself.hitStack = [];
+            let timeDiff = checkTimeDiff(
+                itself.hitStack, 
+                itself.options.timeGap, 
+                itself.options.warningTime,
+                itself.a_warn ? () => console.log('Almost there, but should be faster!') : false
+                );
+
+            // if the gap between key strocks was too high
+            // won't call the callback and reset hit-stack and next-match expected
+            if (!timeDiff) {
+                // But first reset the hit-stack array as well as next-match expected
+                itself.reset();
+            }
+
+            // if the two lengthes are equal, the shortcut keys have got hit in the correct sequence
+            // and it is time to run the callback()
+            if (itself.options.activationKeys.length === itself.hitStack.length) {
+                // But first reset the hit-stack array as well as next-match expected
+                itself.reset();
+
                 callback();
             }
         });
@@ -156,6 +175,8 @@ class Surecut {
     }
 
     /**
+     * functional method 
+     * 
      * add a cssClassName to the elements that have className class
      * 
      * @param {string} className the class names need to be added
@@ -175,6 +196,8 @@ class Surecut {
     }
 
     /**
+     * functional method 
+     * 
      * focus on the targeted (the first) element(s)
      * 
      */
@@ -197,12 +220,14 @@ class Surecut {
     }
 
     /**
+     * functional method 
+     * 
      * keyboard shortcut to simulate click
      */
     click() {
         let myself = this;
 
-        this.doitx(function() {
+        this.doit(function() {
             myself.targetedElements.map(function(el) {
                 el.click();
             });
