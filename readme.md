@@ -2,26 +2,41 @@
 
 ## Example
 ```javascript
-const aClass = require('Surecut');
-var c = new aClass();
+require('./bootstrap');
 
-c.initial()
-    .addClass('red', 'target');
+const aClass = require('Surecut');
+
+let a = new aClass();
+a.initial({ activationKeys: ['/', '/', 'a']})
+    .target('.add_class_red')
+    .addClass('red');
+
+let b = new aClass();
+b.initial({ activationKeys: ['/', '/', 'b']})
+    .target('#focus_on_me')
+    .focus();
+
+let d = new aClass();
+d.initial({ activationKeys: ['/', '/', 'd']})
+    .target('#clickme')
+    .click();
 ```
 
-And then hit the 'Slash' key twice
+And then hit '/' + '/' + ('a' or 'c' or 'd')
 
 ## The shortcut key/character
-the default key to trigger is slash (actually double slash)
-but can get activated by another key
+The default key to trigger is slash (actually double slash), but can get bind to other list of characters
 You can specify either a character (eg: "/") or key-code (eg: 191)
+```
+[191, 191, 65]
+```
 
 # Options
-it can customized by passing an object to the initial() method
+it can customized by passing the object of options to the `initial()` method
 
-the 'activation_key' can accept either keyCodes (eg: 191 slash (/)) or the key (the character) itself (eg: '/')
+The 'activation_key' can accept either keyCodes (eg: 191 slash (/)) or the key (the character) itself (eg: '/')
 ```javascript
 
-c.initial({a_key: 191, w_time: 300})
+c.initial({activationKeys: [191, 191, 65], gapTime: 500})
     .addClass('red', 'target');
 ```

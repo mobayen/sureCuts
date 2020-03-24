@@ -1,17 +1,26 @@
 {
   "name": "surecut",
-  "version": "0.0.0",
-  "description": "handle shortcuts",
+  "version": "1.0.0",
+  "description": "Bind keyboard shortcuts to tasks",
   "main": "app.js",
   "scripts": {
-    "test": "test"
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mobayen/sureCuts.git"
   },
   "keywords": [
-    "js",
-    "javascript",
     "shortcut",
-    "keyboard"
+    "keyboard",
+    "key",
+    "js",
+    "javascript"
   ],
-  "author": "saintMim",
-  "license": "ISC"
+  "author": "saint MiM",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mobayen/sureCuts/issues"
+  },
+  "homepage": "https://github.com/mobayen/sureCuts#readme"
 }
