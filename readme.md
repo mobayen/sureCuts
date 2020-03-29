@@ -2,8 +2,6 @@
 
 ## Example
 ```javascript
-require('./bootstrap');
-
 const aClass = require('Surecut');
 
 let a = new aClass();
